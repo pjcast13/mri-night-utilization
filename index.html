@@ -34,10 +34,16 @@
     font-weight: 600;
     margin-bottom: 4px;
   }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
   .subtitle {
     font-size: 15px;
     color: var(--stone);
-    margin-bottom: 32px;
+    margin-top: 4px;
   }
   h2 {
     font-family: 'Source Serif 4', 'Georgia', serif;
@@ -45,6 +51,37 @@
     font-weight: 600;
     color: var(--clay);
     margin-bottom: 4px;
+  }
+
+  /* FY Toggle */
+  .fy-toggle {
+    display: flex;
+    background: var(--light-grey);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .fy-toggle button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--stone);
+    transition: all 0.2s;
+  }
+  .fy-toggle button.active {
+    background: var(--white);
+    color: var(--cardinal);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .fy-toggle button:hover:not(.active) {
+    color: var(--clay);
   }
 
   /* Comparison cards */
@@ -87,11 +124,13 @@
     font-size: 32px;
     font-weight: 700;
     line-height: 1.1;
+    transition: all 0.3s;
   }
   .metric-site .site-detail {
     font-size: 12px;
     color: var(--stone);
     margin-top: 2px;
+    transition: all 0.3s;
   }
   .val-bad { color: var(--cardinal); }
   .val-good { color: var(--canopy); }
@@ -102,9 +141,7 @@
   }
 
   /* Side-by-side chart layout */
-  .chart-section {
-    margin-bottom: 48px;
-  }
+  .chart-section { margin-bottom: 48px; }
   .chart-desc {
     font-size: 14px;
     color: var(--stone);
@@ -115,9 +152,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
-  .chart-panel {
-    position: relative;
-  }
+  .chart-panel { position: relative; }
   .chart-panel h3 {
     font-size: 14px;
     font-weight: 600;
@@ -180,8 +215,8 @@
   .heatmap-table td {
     text-align: center;
     padding: 7px 1px;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 8px;
+    font-weight: 400;
     border-radius: 2px;
   }
 
@@ -207,7 +242,13 @@
 <body>
 
 <h1>Same System, Different Outcomes</h1>
-<p class="subtitle">MRI night utilization: 300 Pasteur vs 500 Pasteur &nbsp;|&nbsp; FY25 + FY26 YTD (Sep 2024 – Apr 2026) &nbsp;|&nbsp; 500P has overnight remote physician coverage. 300P does not.</p>
+<div class="header-row">
+  <p class="subtitle" id="subtitleText">MRI night utilization: 300 Pasteur vs 500 Pasteur &nbsp;|&nbsp; FY25 + FY26 YTD (Sep 2024 – Apr 2026) &nbsp;|&nbsp; 500P has overnight remote physician coverage. 300P does not.</p>
+  <div class="fy-toggle">
+    <button id="btnAll" class="active" onclick="switchFY('all')">FY25 + FY26</button>
+    <button id="btnFY26" onclick="switchFY('fy26')">FY26 Only</button>
+  </div>
+</div>
 
 <!-- Comparison summary cards -->
 <div class="compare-row">
@@ -216,14 +257,14 @@
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad">23%</div>
-        <div class="site-detail">1,543 of 6,775</div>
+        <div class="site-value val-bad" id="nightVol300">23%</div>
+        <div class="site-detail" id="nightVolDetail300">1,543 of 6,775</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good">46%</div>
-        <div class="site-detail">7,915 of 17,238</div>
+        <div class="site-value val-good" id="nightVol500">46%</div>
+        <div class="site-detail" id="nightVolDetail500">7,915 of 17,238</div>
       </div>
     </div>
   </div>
@@ -232,13 +273,13 @@
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad">10.1h</div>
+        <div class="site-value val-bad" id="nightTat300">10.1h</div>
         <div class="site-detail">Order to begin exam</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good">8.4h</div>
+        <div class="site-value val-good" id="nightTat500">8.4h</div>
         <div class="site-detail">Order to begin exam</div>
       </div>
     </div>
@@ -248,13 +289,13 @@
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad">8%</div>
+        <div class="site-value val-bad" id="scannerPct300">8%</div>
         <div class="site-detail">Avg across 3 scanners</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good">38%</div>
+        <div class="site-value val-good" id="scannerPct500">38%</div>
         <div class="site-detail">Avg across 3 scanners</div>
       </div>
     </div>
@@ -280,7 +321,7 @@
 <!-- Section 2: TAT by Hour -->
 <div class="chart-section">
   <h2>Inpatient Order-to-Begin TAT by Hour</h2>
-  <p class="chart-desc">Median wait time from order to scan start. Same Y-axis scale. 500P TAT stays low around the clock.</p>
+  <p class="chart-desc">Median wait time from order to scan start. Same Y-axis scale.</p>
   <div class="side-by-side">
     <div class="chart-panel">
       <h3>300 Pasteur <span class="coverage-tag tag-no">NO OVERNIGHT COVERAGE</span></h3>
@@ -296,7 +337,7 @@
 <!-- Section 3: Scanner Heatmap -->
 <div class="chart-section">
   <h2>Scanner Utilization: % of Days Active by Hour</h2>
-  <p class="chart-desc">How often each scanner ran at least one exam during that hour. 500P scanners stay lit. 300P's SHMR02 and SHMR04 go dark.</p>
+  <p class="chart-desc">How often each scanner ran at least one exam during that hour.</p>
   <div class="side-by-side">
     <div class="chart-panel">
       <h3>300 Pasteur <span class="coverage-tag tag-no">NO OVERNIGHT COVERAGE</span></h3>
@@ -315,7 +356,6 @@
 </div>
 
 <script>
-// Reordered hours: 7am through 6am
 const HOURS = ['7a','8a','9a','10a','11a','12p','1p','2p','3p','4p','5p','6p','7p','8p','9p','10p','11p','12a','1a','2a','3a','4a','5a','6a'];
 const CARDINAL = '#8C1515';
 const CLAY = '#5F574F';
@@ -326,8 +366,8 @@ const FOG = '#DAD7CB';
 const CANOPY = '#2D6A4F';
 const STONE = '#928B81';
 
-// Data (all reordered: starts at 7am)
-const DATA = {
+// ===== ALL DATA (FY25+FY26) =====
+const DATA_ALL = {
   '300P': {
     op: [234,311,292,280,264,232,275,204,173,143,136,86,47,46,45,39,3,9,3,2,0,0,0,3],
     ip: [21,101,74,103,110,177,160,205,233,249,255,121,84,157,163,93,21,8,10,7,5,6,5,1],
@@ -338,7 +378,8 @@ const DATA = {
       'SHMR02': [37.1,32.7,35.3,37.3,29.0,30.0,34.7,29.0,29.0,32.0,30.2,15.5,7.8,12.7,12.4,9.2,2.0,1.4,1.8,1.6,1.2,1.4,0.8,0.4],
       'SHMR03': [12.2,21.4,19.1,17.8,23.7,23.9,27.8,26.6,29.3,30.5,33.4,23.2,24.7,26.6,28.6,24.3,7.1,11.2,7.9,7.1,6.6,4.6,4.2,2.7],
       'SHMR04': [6.8,27.1,14.9,20.0,23.4,35.6,34.4,41.2,41.2,37.3,38.5,24.4,16.6,22.4,20.7,16.1,4.4,3.4,4.1,2.2,2.7,1.0,0.7,1.0],
-    }
+    },
+    summary: { nightPct: '23%', nightDetail: '1,543 of 6,775', nightTat: '10.1h', scannerPct: '8%' }
   },
   '500P': {
     op: [92,178,141,102,100,108,121,119,116,153,161,88,189,148,129,156,137,123,154,134,121,87,79,21],
@@ -350,11 +391,44 @@ const DATA = {
       'SH500MR05': [28.6,62.3,50.4,52.7,50.3,50.3,55.4,51.3,55.2,50.1,59.2,33.4,60.5,55.2,56.6,58.3,46.8,51.8,52.0,48.7,48.0,41.7,29.5,6.2],
       'SH500MR06': [25.9,58.9,50.2,54.1,49.8,55.1,52.4,51.7,49.3,57.5,49.1,32.9,47.1,53.4,49.1,50.5,42.3,32.0,38.9,37.8,31.8,30.5,28.3,5.7],
       'SH500MR07': [6.5,31.8,31.0,31.8,39.5,46.0,42.9,39.0,46.3,44.2,39.5,22.0,45.5,44.2,45.2,45.5,33.3,32.3,29.7,29.5,20.2,21.7,14.5,1.3],
-    }
-  }
+    },
+    summary: { nightPct: '46%', nightDetail: '7,915 of 17,238', nightTat: '8.4h', scannerPct: '38%' }
+  },
+  subtitle: 'FY25 + FY26 YTD (Sep 2024 – Apr 2026)',
 };
 
-// Night shade plugin — night = indices 12-23 (7p through 6a)
+// ===== FY26 ONLY =====
+const DATA_FY26 = {
+  '300P': {
+    op: [93,133,127,121,111,103,129,100,88,68,64,39,32,22,15,20,2,7,2,1,0,0,0,1],
+    ip: [7,49,33,58,55,79,73,84,95,98,107,52,42,94,73,59,16,8,8,4,3,0,4,1],
+    ed: [15,15,9,13,18,25,31,32,40,56,59,53,58,55,48,50,27,34,24,23,19,15,15,9],
+    tat: [41.0,22.5,22.4,23.3,41.4,24.5,27.0,23.9,28.3,26.6,21.1,29.9,21.7,13.0,13.5,14.6,12.8,6.8,6.3,17.1,3.4,0,12.4,5.0],
+    p75: [44.2,45.8,45.0,42.5,50.1,45.7,50.2,44.8,57.1,46.6,46.6,53.1,32.1,30.4,31.1,32.3,51.2,14.0,8.8,61.0,16.9,0,14.9,5.0],
+    heatmap: {
+      'SHMR02': [33.2,37.8,31.6,37.8,28.0,30.1,39.9,32.1,33.2,28.5,30.6,16.6,9.8,16.6,11.9,8.8,3.1,3.1,3.1,1.0,1.6,1.0,1.6,0.5],
+      'SHMR03': [11.4,23.2,21.8,23.7,30.3,28.9,34.1,31.3,34.1,38.4,41.7,27.5,37.9,37.9,36.0,37.4,12.8,14.7,10.4,10.0,8.5,5.7,6.2,2.8],
+      'SHMR04': [13.0,30.9,19.8,27.8,28.4,40.1,37.7,45.7,40.1,42.0,41.4,27.2,19.1,26.5,20.4,15.4,5.6,4.9,2.5,1.2,0.6,0.0,1.2,1.9],
+    },
+    summary: { nightPct: '25%', nightDetail: '796 of 3,137', nightTat: '12.5h', scannerPct: '11%' }
+  },
+  '500P': {
+    op: [33,36,41,20,32,33,41,41,38,42,52,31,59,52,51,58,50,53,62,55,49,41,37,12],
+    ip: [138,234,207,208,234,193,206,198,195,198,147,102,146,147,183,176,150,157,149,172,141,150,142,25],
+    ed: [21,27,24,43,26,45,66,67,59,74,82,50,103,80,69,78,56,55,58,45,48,31,27,5],
+    tat: [17.6,21.0,22.1,18.5,19.6,22.6,18.2,20.3,13.2,15.1,14.0,8.5,8.4,8.9,8.4,9.7,8.9,7.6,9.4,10.2,9.5,10.8,13.2,13.1],
+    p75: [36.9,40.8,45.4,38.0,40.1,43.2,33.0,29.4,29.7,30.2,31.5,30.6,27.2,24.9,20.5,26.6,27.3,15.0,14.6,17.3,18.9,17.9,20.4,18.5],
+    heatmap: {
+      'SH500MR05': [43.6,60.1,57.3,53.2,57.3,52.8,65.6,61.9,58.7,57.8,61.0,37.2,64.7,56.9,59.6,63.3,50.9,60.6,56.9,55.0,52.3,47.7,40.8,9.6],
+      'SH500MR06': [38.5,61.5,53.7,57.3,58.7,58.7,60.1,57.8,56.4,66.5,54.1,38.1,56.9,57.3,58.7,58.7,50.0,43.6,52.3,55.5,46.8,43.6,44.5,9.2],
+      'SH500MR07': [9.1,36.4,27.3,22.7,36.4,45.5,45.5,45.5,36.4,54.5,27.3,27.3,27.3,27.3,50.0,59.1,27.3,45.5,22.7,40.9,18.2,36.4,18.2,4.5],
+    },
+    summary: { nightPct: '47%', nightDetail: '2,978 of 6,275', nightTat: '9.4h', scannerPct: '44%' }
+  },
+  subtitle: 'FY26 Only (Sep 2025 – Apr 2026)',
+};
+
+// Night shade plugin
 const nightShade = {
   id: 'nightShade',
   beforeDraw(chart) {
@@ -370,19 +444,23 @@ const nightShade = {
   }
 };
 
-// Shared Y max for volume charts
-const volMax300 = Math.max(...HOURS.map((_, i) => DATA['300P'].op[i] + DATA['300P'].ip[i] + DATA['300P'].ed[i]));
-const volMax500 = Math.max(...HOURS.map((_, i) => DATA['500P'].op[i] + DATA['500P'].ip[i] + DATA['500P'].ed[i]));
-const VOL_MAX = Math.ceil(Math.max(volMax300, volMax500) / 100) * 100;
+// Chart instances (for destroy/rebuild)
+let charts = {};
 
-// Shared Y max for TAT charts
-const tatMax300 = Math.max(...DATA['300P'].p75);
-const tatMax500 = Math.max(...DATA['500P'].p75);
-const TAT_MAX = Math.ceil(Math.max(tatMax300, tatMax500) / 5) * 5;
+function getVolMax(data) {
+  const m3 = Math.max(...HOURS.map((_, i) => data['300P'].op[i] + data['300P'].ip[i] + data['300P'].ed[i]));
+  const m5 = Math.max(...HOURS.map((_, i) => data['500P'].op[i] + data['500P'].ip[i] + data['500P'].ed[i]));
+  return Math.ceil(Math.max(m3, m5) / 100) * 100;
+}
+function getTatMax(data) {
+  const m3 = Math.max(...data['300P'].p75);
+  const m5 = Math.max(...data['500P'].p75);
+  return Math.ceil(Math.max(m3, m5) / 5) * 5;
+}
 
-function buildVolumeChart(canvasId, siteKey) {
-  const d = DATA[siteKey];
-  new Chart(document.getElementById(canvasId).getContext('2d'), {
+function buildVolumeChart(canvasId, siteKey, data, volMax) {
+  const d = data[siteKey];
+  return new Chart(document.getElementById(canvasId).getContext('2d'), {
     type: 'bar',
     data: {
       labels: HOURS,
@@ -394,22 +472,23 @@ function buildVolumeChart(canvasId, siteKey) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: { duration: 400 },
       plugins: {
         legend: { position: 'top', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
         tooltip: { callbacks: { afterBody: items => 'Total: ' + items.reduce((s,i) => s+i.raw, 0) } }
       },
       scales: {
         x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: STONE } },
-        y: { stacked: true, max: VOL_MAX, title: { display: true, text: 'Exams', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
+        y: { stacked: true, max: volMax, title: { display: true, text: 'Exams', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
       }
     },
     plugins: [nightShade]
   });
 }
 
-function buildTATChart(canvasId, siteKey) {
-  const d = DATA[siteKey];
-  new Chart(document.getElementById(canvasId).getContext('2d'), {
+function buildTATChart(canvasId, siteKey, data, tatMax) {
+  const d = data[siteKey];
+  return new Chart(document.getElementById(canvasId).getContext('2d'), {
     type: 'line',
     data: {
       labels: HOURS,
@@ -439,6 +518,7 @@ function buildTATChart(canvasId, siteKey) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: { duration: 400 },
       plugins: {
         legend: {
           position: 'top',
@@ -451,20 +531,13 @@ function buildTATChart(canvasId, siteKey) {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10 }, color: STONE } },
-        y: { min: 0, max: TAT_MAX, title: { display: true, text: 'Hours', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
+        y: { min: 0, max: tatMax, title: { display: true, text: 'Hours', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
       }
     },
     plugins: [nightShade]
   });
 }
 
-// Build all charts
-buildVolumeChart('vol300', '300P');
-buildVolumeChart('vol500', '500P');
-buildTATChart('tat300', '300P');
-buildTATChart('tat500', '500P');
-
-// Heatmaps
 function heatColor(val) {
   if (val < 3) return 'rgba(140, 21, 21, 0.06)';
   if (val < 10) return 'rgba(140, 21, 21, 0.15)';
@@ -476,8 +549,8 @@ function heatColor(val) {
 }
 function textColor(val) { return val >= 30 ? '#fff' : '#5F574F'; }
 
-function buildHeatmap(containerId, siteKey) {
-  const d = DATA[siteKey].heatmap;
+function buildHeatmap(containerId, siteKey, data) {
+  const d = data[siteKey].heatmap;
   let html = '<table class="heatmap-table"><thead><tr><th class="scanner-label"></th>';
   HOURS.forEach((h, i) => {
     html += `<th style="${i >= 12 ? 'color:'+CARDINAL : ''}">${h}</th>`;
@@ -491,7 +564,6 @@ function buildHeatmap(containerId, siteKey) {
     html += '</tr>';
   }
   html += '</tbody></table>';
-  // Legend
   html += '<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#928B81;align-items:center;flex-wrap:wrap;">';
   [['<3%','rgba(140,21,21,0.06)'],['3–10%','rgba(140,21,21,0.15)'],['10–20%','rgba(140,21,21,0.28)'],['20–30%','rgba(140,21,21,0.42)'],['30–50%','rgba(140,21,21,0.56)'],['50%+','rgba(140,21,21,0.80)']].forEach(([l,bg]) => {
     html += `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:12px;height:12px;border-radius:2px;background:${bg};display:inline-block"></span>${l}</span>`;
@@ -500,8 +572,43 @@ function buildHeatmap(containerId, siteKey) {
   document.getElementById(containerId).innerHTML = html;
 }
 
-buildHeatmap('heatmap300', '300P');
-buildHeatmap('heatmap500', '500P');
+function updateSummaryCards(data) {
+  document.getElementById('nightVol300').textContent = data['300P'].summary.nightPct;
+  document.getElementById('nightVolDetail300').textContent = data['300P'].summary.nightDetail;
+  document.getElementById('nightVol500').textContent = data['500P'].summary.nightPct;
+  document.getElementById('nightVolDetail500').textContent = data['500P'].summary.nightDetail;
+  document.getElementById('nightTat300').textContent = data['300P'].summary.nightTat;
+  document.getElementById('nightTat500').textContent = data['500P'].summary.nightTat;
+  document.getElementById('scannerPct300').textContent = data['300P'].summary.scannerPct;
+  document.getElementById('scannerPct500').textContent = data['500P'].summary.scannerPct;
+  document.getElementById('subtitleText').innerHTML = 'MRI night utilization: 300 Pasteur vs 500 Pasteur &nbsp;|&nbsp; ' + data.subtitle + ' &nbsp;|&nbsp; 500P has overnight remote physician coverage. 300P does not.';
+}
+
+function renderAll(data) {
+  // Destroy existing charts
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+
+  const volMax = getVolMax(data);
+  const tatMax = getTatMax(data);
+
+  charts.vol300 = buildVolumeChart('vol300', '300P', data, volMax);
+  charts.vol500 = buildVolumeChart('vol500', '500P', data, volMax);
+  charts.tat300 = buildTATChart('tat300', '300P', data, tatMax);
+  charts.tat500 = buildTATChart('tat500', '500P', data, tatMax);
+  buildHeatmap('heatmap300', '300P', data);
+  buildHeatmap('heatmap500', '500P', data);
+  updateSummaryCards(data);
+}
+
+function switchFY(mode) {
+  document.getElementById('btnAll').classList.toggle('active', mode === 'all');
+  document.getElementById('btnFY26').classList.toggle('active', mode === 'fy26');
+  renderAll(mode === 'all' ? DATA_ALL : DATA_FY26);
+}
+
+// Initial render
+renderAll(DATA_ALL);
 </script>
 
 </body>
