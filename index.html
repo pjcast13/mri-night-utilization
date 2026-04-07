@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRI Night Utilization: 300P vs 500P</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --cardinal: #8C1515;
+    --clay: #5F574F;
+    --fog: #DAD7CB;
+    --light-grey: #F2F0EF;
+    --sun: #EAAB00;
+    --sky: #0098DB;
+    --poppy: #E04F39;
+    --stone: #928B81;
+    --canopy: #2D6A4F;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Source Sans 3', 'Avenir Next LT Pro', system-ui, sans-serif;
+    background: var(--white);
+    color: var(--clay);
+    padding: 32px 48px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: 'Source Serif 4', 'Georgia', serif;
+    color: var(--cardinal);
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--stone);
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-family: 'Source Serif 4', 'Georgia', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--clay);
+    margin-bottom: 4px;
+  }
+
+  /* Comparison cards */
+  .compare-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+  .compare-card {
+    background: var(--light-grey);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .compare-card .metric-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--stone);
+    margin-bottom: 12px;
+  }
+  .compare-card .metric-pair {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .metric-site {
+    text-align: center;
+    flex: 1;
+  }
+  .metric-site .site-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--stone);
+    margin-bottom: 4px;
+  }
+  .metric-site .site-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .metric-site .site-detail {
+    font-size: 12px;
+    color: var(--stone);
+    margin-top: 2px;
+  }
+  .val-bad { color: var(--cardinal); }
+  .val-good { color: var(--canopy); }
+  .metric-divider {
+    width: 1px;
+    background: var(--fog);
+    align-self: stretch;
+  }
+
+  /* Side-by-side chart layout */
+  .chart-section {
+    margin-bottom: 48px;
+  }
+  .chart-desc {
+    font-size: 14px;
+    color: var(--stone);
+    margin-bottom: 16px;
+  }
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .chart-panel {
+    position: relative;
+  }
+  .chart-panel h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--clay);
+    margin-bottom: 8px;
+  }
+  .chart-panel h3 .coverage-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+  .tag-no { background: var(--cardinal); color: white; }
+  .tag-yes { background: var(--canopy); color: white; }
+  .chart-wrap {
+    position: relative;
+    height: 280px;
+    background: var(--white);
+    border: 1px solid var(--fog);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .night-label {
+    display: inline-block;
+    background: var(--cardinal);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  /* Heatmap */
+  .heatmap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .heatmap-table th {
+    font-weight: 600;
+    padding: 6px 2px;
+    text-align: center;
+    color: var(--stone);
+    font-size: 10px;
+  }
+  .heatmap-table th.scanner-label {
+    text-align: left;
+    font-size: 12px;
+    color: var(--clay);
+    padding-left: 4px;
+    width: 90px;
+  }
+  .heatmap-table td {
+    text-align: center;
+    padding: 7px 1px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 2px;
+  }
+
+  /* Callout */
+  .callout {
+    background: #8C15150D;
+    border-left: 3px solid var(--cardinal);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .callout strong { color: var(--cardinal); }
+
+  @media print {
+    body { padding: 16px; font-size: 12px; }
+    .chart-wrap { border: none; height: 240px; page-break-inside: avoid; }
+    .side-by-side { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Same System, Different Outcomes</h1>
+<p class="subtitle">MRI night utilization: 300 Pasteur vs 500 Pasteur &nbsp;|&nbsp; FY25 + FY26 YTD (Sep 2024 – Apr 2026) &nbsp;|&nbsp; 500P has overnight remote physician coverage. 300P does not.</p>
+
+<!-- Comparison summary cards -->
+<div class="compare-row">
+  <div class="compare-card">
+    <div class="metric-label">Night Volume Share (7p–7a)</div>
+    <div class="metric-pair">
+      <div class="metric-site">
+        <div class="site-label">300P</div>
+        <div class="site-value val-bad">23%</div>
+        <div class="site-detail">1,543 of 6,775</div>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-site">
+        <div class="site-label">500P</div>
+        <div class="site-value val-good">46%</div>
+        <div class="site-detail">7,915 of 17,238</div>
+      </div>
+    </div>
+  </div>
+  <div class="compare-card">
+    <div class="metric-label">Inpatient TAT Overnight (Median)</div>
+    <div class="metric-pair">
+      <div class="metric-site">
+        <div class="site-label">300P</div>
+        <div class="site-value val-bad">10.1h</div>
+        <div class="site-detail">Order to begin exam</div>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-site">
+        <div class="site-label">500P</div>
+        <div class="site-value val-good">8.4h</div>
+        <div class="site-detail">Order to begin exam</div>
+      </div>
+    </div>
+  </div>
+  <div class="compare-card">
+    <div class="metric-label">Scanner-Hours Active Overnight</div>
+    <div class="metric-pair">
+      <div class="metric-site">
+        <div class="site-label">300P</div>
+        <div class="site-value val-bad">8%</div>
+        <div class="site-detail">Avg across 3 scanners</div>
+      </div>
+      <div class="metric-divider"></div>
+      <div class="metric-site">
+        <div class="site-label">500P</div>
+        <div class="site-value val-good">38%</div>
+        <div class="site-detail">Avg across 3 scanners</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1: Volume by Hour -->
+<div class="chart-section">
+  <h2>Exam Volume by Hour <span class="night-label">7P–7A SHADED</span></h2>
+  <p class="chart-desc">Stacked by patient class. Same Y-axis scale. 500P maintains volume through the night. 300P craters.</p>
+  <div class="side-by-side">
+    <div class="chart-panel">
+      <h3>300 Pasteur <span class="coverage-tag tag-no">NO OVERNIGHT COVERAGE</span></h3>
+      <div class="chart-wrap"><canvas id="vol300"></canvas></div>
+    </div>
+    <div class="chart-panel">
+      <h3>500 Pasteur <span class="coverage-tag tag-yes">REMOTE PHYSICIAN COVERAGE</span></h3>
+      <div class="chart-wrap"><canvas id="vol500"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: TAT by Hour -->
+<div class="chart-section">
+  <h2>Inpatient Order-to-Begin TAT by Hour</h2>
+  <p class="chart-desc">Median wait time from order to scan start. Same Y-axis scale. 500P TAT stays low around the clock.</p>
+  <div class="side-by-side">
+    <div class="chart-panel">
+      <h3>300 Pasteur <span class="coverage-tag tag-no">NO OVERNIGHT COVERAGE</span></h3>
+      <div class="chart-wrap"><canvas id="tat300"></canvas></div>
+    </div>
+    <div class="chart-panel">
+      <h3>500 Pasteur <span class="coverage-tag tag-yes">REMOTE PHYSICIAN COVERAGE</span></h3>
+      <div class="chart-wrap"><canvas id="tat500"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Scanner Heatmap -->
+<div class="chart-section">
+  <h2>Scanner Utilization: % of Days Active by Hour</h2>
+  <p class="chart-desc">How often each scanner ran at least one exam during that hour. 500P scanners stay lit. 300P's SHMR02 and SHMR04 go dark.</p>
+  <div class="side-by-side">
+    <div class="chart-panel">
+      <h3>300 Pasteur <span class="coverage-tag tag-no">NO OVERNIGHT COVERAGE</span></h3>
+      <div id="heatmap300"></div>
+    </div>
+    <div class="chart-panel">
+      <h3>500 Pasteur <span class="coverage-tag tag-yes">REMOTE PHYSICIAN COVERAGE</span></h3>
+      <div id="heatmap500"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Callout -->
+<div class="callout">
+  <strong>500P has coverage and its scanners stay active at night. 300P doesn't and two of three go dark.</strong> Same health system, same patient population, different outcomes. 500P runs 46% of its MRI volume overnight with remote physician support. 300P manages just 23%. Adding remote coverage to 300P through Tether could double overnight throughput, reduce inpatient wait times, and unlock capacity that's already installed and paid for.
+</div>
+
+<script>
+// Reordered hours: 7am through 6am
+const HOURS = ['7a','8a','9a','10a','11a','12p','1p','2p','3p','4p','5p','6p','7p','8p','9p','10p','11p','12a','1a','2a','3a','4a','5a','6a'];
+const CARDINAL = '#8C1515';
+const CLAY = '#5F574F';
+const SUN = '#EAAB00';
+const SKY = '#0098DB';
+const POPPY = '#E04F39';
+const FOG = '#DAD7CB';
+const CANOPY = '#2D6A4F';
+const STONE = '#928B81';
+
+// Data (all reordered: starts at 7am)
+const DATA = {
+  '300P': {
+    op: [234,311,292,280,264,232,275,204,173,143,136,86,47,46,45,39,3,9,3,2,0,0,0,3],
+    ip: [21,101,74,103,110,177,160,205,233,249,255,121,84,157,163,93,21,8,10,7,5,6,5,1],
+    ed: [29,24,17,23,40,56,70,75,94,113,122,109,107,110,99,115,46,69,57,50,50,32,25,17],
+    tat: [22.2,21.8,23.3,22.3,24.9,21.3,23.3,22.4,25.0,17.0,20.1,17.0,17.1,11.0,8.9,11.5,9.6,6.8,6.3,9.1,5.7,8.3,10.6,5.0],
+    p75: [44.2,44.9,45.0,46.4,47.0,42.8,45.6,30.7,46.8,31.4,33.0,31.4,31.3,29.7,28.0,29.5,30.6,14.0,8.0,29.9,7.3,8.7,12.4,5.0],
+    heatmap: {
+      'SHMR02': [37.1,32.7,35.3,37.3,29.0,30.0,34.7,29.0,29.0,32.0,30.2,15.5,7.8,12.7,12.4,9.2,2.0,1.4,1.8,1.6,1.2,1.4,0.8,0.4],
+      'SHMR03': [12.2,21.4,19.1,17.8,23.7,23.9,27.8,26.6,29.3,30.5,33.4,23.2,24.7,26.6,28.6,24.3,7.1,11.2,7.9,7.1,6.6,4.6,4.2,2.7],
+      'SHMR04': [6.8,27.1,14.9,20.0,23.4,35.6,34.4,41.2,41.2,37.3,38.5,24.4,16.6,22.4,20.7,16.1,4.4,3.4,4.1,2.2,2.7,1.0,0.7,1.0],
+    }
+  },
+  '500P': {
+    op: [92,178,141,102,100,108,121,119,116,153,161,88,189,148,129,156,137,123,154,134,121,87,79,21],
+    ip: [225,642,550,588,599,619,566,526,562,506,459,289,421,497,516,511,411,407,405,416,360,367,281,42],
+    ed: [51,71,79,116,97,136,173,176,202,216,231,134,282,227,217,217,161,155,137,118,107,92,61,11],
+    tat: [16.6,18.4,18.6,19.1,18.1,19.2,13.2,9.3,7.4,7.8,7.2,6.8,6.0,7.3,7.1,8.0,8.7,8.1,8.7,10.4,9.5,11.3,12.8,14.3],
+    p75: [24.2,36.7,40.2,38.6,28.8,28.4,25.9,27.8,27.0,27.5,27.4,25.9,20.6,16.0,12.8,15.3,15.7,14.2,14.3,16.0,17.3,17.2,19.1,18.5],
+    heatmap: {
+      'SH500MR05': [28.6,62.3,50.4,52.7,50.3,50.3,55.4,51.3,55.2,50.1,59.2,33.4,60.5,55.2,56.6,58.3,46.8,51.8,52.0,48.7,48.0,41.7,29.5,6.2],
+      'SH500MR06': [25.9,58.9,50.2,54.1,49.8,55.1,52.4,51.7,49.3,57.5,49.1,32.9,47.1,53.4,49.1,50.5,42.3,32.0,38.9,37.8,31.8,30.5,28.3,5.7],
+      'SH500MR07': [6.5,31.8,31.0,31.8,39.5,46.0,42.9,39.0,46.3,44.2,39.5,22.0,45.5,44.2,45.2,45.5,33.3,32.3,29.7,29.5,20.2,21.7,14.5,1.3],
+    }
+  }
+};
+
+// Night shade plugin — night = indices 12-23 (7p through 6a)
+const nightShade = {
+  id: 'nightShade',
+  beforeDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!chartArea) return;
+    const xScale = scales.x;
+    ctx.save();
+    ctx.fillStyle = 'rgba(140, 21, 21, 0.13)';
+    const x12 = xScale.getPixelForValue(12) - xScale.width / 48;
+    const x23 = xScale.getPixelForValue(23) + xScale.width / 48;
+    ctx.fillRect(x12, chartArea.top, x23 - x12, chartArea.bottom - chartArea.top);
+    ctx.restore();
+  }
+};
+
+// Shared Y max for volume charts
+const volMax300 = Math.max(...HOURS.map((_, i) => DATA['300P'].op[i] + DATA['300P'].ip[i] + DATA['300P'].ed[i]));
+const volMax500 = Math.max(...HOURS.map((_, i) => DATA['500P'].op[i] + DATA['500P'].ip[i] + DATA['500P'].ed[i]));
+const VOL_MAX = Math.ceil(Math.max(volMax300, volMax500) / 100) * 100;
+
+// Shared Y max for TAT charts
+const tatMax300 = Math.max(...DATA['300P'].p75);
+const tatMax500 = Math.max(...DATA['500P'].p75);
+const TAT_MAX = Math.ceil(Math.max(tatMax300, tatMax500) / 5) * 5;
+
+function buildVolumeChart(canvasId, siteKey) {
+  const d = DATA[siteKey];
+  new Chart(document.getElementById(canvasId).getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: HOURS,
+      datasets: [
+        { label: 'Emergency', data: d.ed, backgroundColor: POPPY + 'CC', order: 3 },
+        { label: 'Inpatient', data: d.ip, backgroundColor: SKY + 'CC', order: 2 },
+        { label: 'Outpatient', data: d.op, backgroundColor: SUN + 'CC', order: 1 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { afterBody: items => 'Total: ' + items.reduce((s,i) => s+i.raw, 0) } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: STONE } },
+        y: { stacked: true, max: VOL_MAX, title: { display: true, text: 'Exams', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
+      }
+    },
+    plugins: [nightShade]
+  });
+}
+
+function buildTATChart(canvasId, siteKey) {
+  const d = DATA[siteKey];
+  new Chart(document.getElementById(canvasId).getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: HOURS,
+      datasets: [
+        {
+          label: 'P75',
+          data: d.p75,
+          borderColor: 'transparent',
+          backgroundColor: SKY + '20',
+          fill: '+1',
+          pointRadius: 0,
+          tension: 0.3,
+        },
+        {
+          label: 'Median TAT',
+          data: d.tat,
+          borderColor: CARDINAL,
+          borderWidth: 3,
+          fill: false,
+          pointRadius: 3,
+          pointBackgroundColor: ctx => ctx.dataIndex >= 12 ? CARDINAL : CLAY,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          tension: 0.3,
+        },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true, padding: 12, font: { size: 11 },
+            filter: item => item.text === 'Median TAT' || item.text === 'P75'
+          }
+        },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label === 'Median TAT' ? 'Median: ' + ctx.raw + 'h' : '75th: ' + ctx.raw + 'h' } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: STONE } },
+        y: { min: 0, max: TAT_MAX, title: { display: true, text: 'Hours', font: { size: 11 }, color: STONE }, grid: { color: FOG }, ticks: { font: { size: 10 }, color: STONE } }
+      }
+    },
+    plugins: [nightShade]
+  });
+}
+
+// Build all charts
+buildVolumeChart('vol300', '300P');
+buildVolumeChart('vol500', '500P');
+buildTATChart('tat300', '300P');
+buildTATChart('tat500', '500P');
+
+// Heatmaps
+function heatColor(val) {
+  if (val < 3) return 'rgba(140, 21, 21, 0.06)';
+  if (val < 10) return 'rgba(140, 21, 21, 0.15)';
+  if (val < 20) return 'rgba(140, 21, 21, 0.28)';
+  if (val < 30) return 'rgba(140, 21, 21, 0.42)';
+  if (val < 40) return 'rgba(140, 21, 21, 0.56)';
+  if (val < 50) return 'rgba(140, 21, 21, 0.68)';
+  return 'rgba(140, 21, 21, 0.80)';
+}
+function textColor(val) { return val >= 30 ? '#fff' : '#5F574F'; }
+
+function buildHeatmap(containerId, siteKey) {
+  const d = DATA[siteKey].heatmap;
+  let html = '<table class="heatmap-table"><thead><tr><th class="scanner-label"></th>';
+  HOURS.forEach((h, i) => {
+    html += `<th style="${i >= 12 ? 'color:'+CARDINAL : ''}">${h}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+  for (const [scanner, vals] of Object.entries(d)) {
+    html += `<tr><th class="scanner-label">${scanner}</th>`;
+    vals.forEach((v, i) => {
+      html += `<td style="background:${heatColor(v)};color:${textColor(v)}">${Math.round(v)}%</td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  // Legend
+  html += '<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#928B81;align-items:center;flex-wrap:wrap;">';
+  [['<3%','rgba(140,21,21,0.06)'],['3–10%','rgba(140,21,21,0.15)'],['10–20%','rgba(140,21,21,0.28)'],['20–30%','rgba(140,21,21,0.42)'],['30–50%','rgba(140,21,21,0.56)'],['50%+','rgba(140,21,21,0.80)']].forEach(([l,bg]) => {
+    html += `<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:12px;height:12px;border-radius:2px;background:${bg};display:inline-block"></span>${l}</span>`;
+  });
+  html += '</div>';
+  document.getElementById(containerId).innerHTML = html;
+}
+
+buildHeatmap('heatmap300', '300P');
+buildHeatmap('heatmap500', '500P');
+</script>
+
+</body>
+</html>
