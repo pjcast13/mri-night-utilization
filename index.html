@@ -253,18 +253,18 @@
 <!-- Comparison summary cards -->
 <div class="compare-row">
   <div class="compare-card">
-    <div class="metric-label">Night Volume Share (7p–7a)</div>
+    <div class="metric-label">Night Volume Share (11p–7a)</div>
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad" id="nightVol300">23%</div>
-        <div class="site-detail" id="nightVolDetail300">1,543 of 6,775</div>
+        <div class="site-value val-bad" id="nightVol300">6%</div>
+        <div class="site-detail" id="nightVolDetail300">429 of 6,775</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good" id="nightVol500">46%</div>
-        <div class="site-detail" id="nightVolDetail500">7,915 of 17,238</div>
+        <div class="site-value val-good" id="nightVol500">25%</div>
+        <div class="site-detail" id="nightVolDetail500">4,393 of 17,238</div>
       </div>
     </div>
   </div>
@@ -273,13 +273,13 @@
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad" id="nightTat300">10.1h</div>
+        <div class="site-value val-bad" id="nightTat300">7.3h</div>
         <div class="site-detail">Order to begin exam</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good" id="nightTat500">8.4h</div>
+        <div class="site-value val-good" id="nightTat500">9.6h</div>
         <div class="site-detail">Order to begin exam</div>
       </div>
     </div>
@@ -289,13 +289,13 @@
     <div class="metric-pair">
       <div class="metric-site">
         <div class="site-label">300P</div>
-        <div class="site-value val-bad" id="scannerPct300">8%</div>
+        <div class="site-value val-bad" id="scannerPct300">3%</div>
         <div class="site-detail">Avg across 3 scanners</div>
       </div>
       <div class="metric-divider"></div>
       <div class="metric-site">
         <div class="site-label">500P</div>
-        <div class="site-value val-good" id="scannerPct500">38%</div>
+        <div class="site-value val-good" id="scannerPct500">31%</div>
         <div class="site-detail">Avg across 3 scanners</div>
       </div>
     </div>
@@ -304,7 +304,7 @@
 
 <!-- Section 1: Volume by Hour -->
 <div class="chart-section">
-  <h2>Exam Volume by Hour <span class="night-label">7P–7A SHADED</span></h2>
+  <h2>Exam Volume by Hour <span class="night-label">11P–7A SHADED</span></h2>
   <p class="chart-desc">Stacked by patient class. Same Y-axis scale. 500P maintains volume through the night. 300P craters.</p>
   <div class="side-by-side">
     <div class="chart-panel">
@@ -352,7 +352,7 @@
 
 <!-- Callout -->
 <div class="callout">
-  <strong>500P has coverage and its scanners stay active at night. 300P doesn't and two of three go dark.</strong> Same health system, same patient population, different outcomes. 500P runs 46% of its MRI volume overnight with remote physician support. 300P manages just 23%. Adding remote coverage to 300P through Tether could double overnight throughput, reduce inpatient wait times, and unlock capacity that's already installed and paid for.
+  <strong>500P has coverage and its scanners stay active at night. 300P doesn't and two of three go dark.</strong> Same health system, same patient population, different outcomes. Between 11pm and 7am, 500P scanners are active 31% of the time. 300P scanners: 3%. Adding remote coverage to 300P through Tether could unlock overnight capacity that's already installed and paid for.
 </div>
 
 <script>
@@ -379,7 +379,7 @@ const DATA_ALL = {
       'SHMR03': [12.2,21.4,19.1,17.8,23.7,23.9,27.8,26.6,29.3,30.5,33.4,23.2,24.7,26.6,28.6,24.3,7.1,11.2,7.9,7.1,6.6,4.6,4.2,2.7],
       'SHMR04': [6.8,27.1,14.9,20.0,23.4,35.6,34.4,41.2,41.2,37.3,38.5,24.4,16.6,22.4,20.7,16.1,4.4,3.4,4.1,2.2,2.7,1.0,0.7,1.0],
     },
-    summary: { nightPct: '23%', nightDetail: '1,543 of 6,775', nightTat: '10.1h', scannerPct: '8%' }
+    summary: { nightPct: '6%', nightDetail: '429 of 6,775', nightTat: '7.3h', scannerPct: '3%' }
   },
   '500P': {
     op: [92,178,141,102,100,108,121,119,116,153,161,88,189,148,129,156,137,123,154,134,121,87,79,21],
@@ -392,7 +392,7 @@ const DATA_ALL = {
       'SH500MR06': [25.9,58.9,50.2,54.1,49.8,55.1,52.4,51.7,49.3,57.5,49.1,32.9,47.1,53.4,49.1,50.5,42.3,32.0,38.9,37.8,31.8,30.5,28.3,5.7],
       'SH500MR07': [6.5,31.8,31.0,31.8,39.5,46.0,42.9,39.0,46.3,44.2,39.5,22.0,45.5,44.2,45.2,45.5,33.3,32.3,29.7,29.5,20.2,21.7,14.5,1.3],
     },
-    summary: { nightPct: '46%', nightDetail: '7,915 of 17,238', nightTat: '8.4h', scannerPct: '38%' }
+    summary: { nightPct: '25%', nightDetail: '4,393 of 17,238', nightTat: '9.6h', scannerPct: '31%' }
   },
   subtitle: 'FY25 + FY26 YTD (Sep 2024 – Apr 2026)',
 };
@@ -410,7 +410,7 @@ const DATA_FY26 = {
       'SHMR03': [11.4,23.2,21.8,23.7,30.3,28.9,34.1,31.3,34.1,38.4,41.7,27.5,37.9,37.9,36.0,37.4,12.8,14.7,10.4,10.0,8.5,5.7,6.2,2.8],
       'SHMR04': [13.0,30.9,19.8,27.8,28.4,40.1,37.7,45.7,40.1,42.0,41.4,27.2,19.1,26.5,20.4,15.4,5.6,4.9,2.5,1.2,0.6,0.0,1.2,1.9],
     },
-    summary: { nightPct: '25%', nightDetail: '796 of 3,137', nightTat: '12.5h', scannerPct: '11%' }
+    summary: { nightPct: '7%', nightDetail: '223 of 3,137', nightTat: '8.8h', scannerPct: '4%' }
   },
   '500P': {
     op: [33,36,41,20,32,33,41,41,38,42,52,31,59,52,51,58,50,53,62,55,49,41,37,12],
@@ -423,7 +423,7 @@ const DATA_FY26 = {
       'SH500MR06': [38.5,61.5,53.7,57.3,58.7,58.7,60.1,57.8,56.4,66.5,54.1,38.1,56.9,57.3,58.7,58.7,50.0,43.6,52.3,55.5,46.8,43.6,44.5,9.2],
       'SH500MR07': [9.1,36.4,27.3,22.7,36.4,45.5,45.5,45.5,36.4,54.5,27.3,27.3,27.3,27.3,50.0,59.1,27.3,45.5,22.7,40.9,18.2,36.4,18.2,4.5],
     },
-    summary: { nightPct: '47%', nightDetail: '2,978 of 6,275', nightTat: '9.4h', scannerPct: '44%' }
+    summary: { nightPct: '28%', nightDetail: '1,772 of 6,275', nightTat: '9.9h', scannerPct: '39%' }
   },
   subtitle: 'FY26 Only (Sep 2025 – Apr 2026)',
 };
@@ -437,9 +437,9 @@ const nightShade = {
     const xScale = scales.x;
     ctx.save();
     ctx.fillStyle = 'rgba(140, 21, 21, 0.13)';
-    const x12 = xScale.getPixelForValue(12) - xScale.width / 48;
+    const x16 = xScale.getPixelForValue(16) - xScale.width / 48;
     const x23 = xScale.getPixelForValue(23) + xScale.width / 48;
-    ctx.fillRect(x12, chartArea.top, x23 - x12, chartArea.bottom - chartArea.top);
+    ctx.fillRect(x16, chartArea.top, x23 - x16, chartArea.bottom - chartArea.top);
     ctx.restore();
   }
 };
@@ -509,7 +509,7 @@ function buildTATChart(canvasId, siteKey, data, tatMax) {
           borderWidth: 3,
           fill: false,
           pointRadius: 3,
-          pointBackgroundColor: ctx => ctx.dataIndex >= 12 ? CARDINAL : CLAY,
+          pointBackgroundColor: ctx => ctx.dataIndex >= 16 ? CARDINAL : CLAY,
           pointBorderColor: '#fff',
           pointBorderWidth: 1.5,
           tension: 0.3,
@@ -553,7 +553,7 @@ function buildHeatmap(containerId, siteKey, data) {
   const d = data[siteKey].heatmap;
   let html = '<table class="heatmap-table"><thead><tr><th class="scanner-label"></th>';
   HOURS.forEach((h, i) => {
-    html += `<th style="${i >= 12 ? 'color:'+CARDINAL : ''}">${h}</th>`;
+    html += `<th style="${i >= 16 ? 'color:'+CARDINAL : ''}">${h}</th>`;
   });
   html += '</tr></thead><tbody>';
   for (const [scanner, vals] of Object.entries(d)) {
